@@ -1,0 +1,144 @@
+.items {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #00000036;
+}
+
+.items:nth-child(odd) {
+    color: var(--odd-color);
+    background-color: var(--odd-fill);
+}
+
+.items:nth-child(even) {
+    color: var(--even-color);
+    background-color: var(--even-fill);
+}
+
+.TableTitleArea {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.TableTitle {
+    margin-left: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #7382f8;
+}
+
+.TableButtons {
+    width: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-right: 20px;
+}
+
+.TableFilterBtn {
+    width: 150px;
+    padding: 7px 10px;
+    background: white;
+    border: 2px solid #d5e2f3;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #001cff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.TableFilterBtn:hover {
+    border-color: #7382f8;
+}
+
+.custom-select {
+    position: relative;
+    width: 150px;
+}
+
+/* Основная кнопка */
+.select-trigger {
+    width: 100%;
+    padding: 7px 10px;
+    background: white;
+    border: 2px solid #d5e2f3;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #001cff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.select-trigger:hover {
+    border-color: #7382f8;
+}
+
+/* Выпадающий список */
+.select-options {
+    position: absolute;
+    top: 105%;
+    width: 100%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
+    padding: 6px 0;
+    z-index: 999;
+}
+
+/* Варианты */
+.select-option {
+    padding: 10px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #7382f8;
+}
+
+.select-option:hover {
+    background: #f4f4fd;
+}
+
+/* Активный пункт */
+.select-option.active {
+    background: #e3e4ff;
+    font-weight: bold;
+}
+
+.Informations {
+    background-color: #e3e4ff;
+    padding: 5px 20px;
+    margin: 2px 7px;
+    color: #363b66;
+    font-size: 18px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.TablePageBtn {
+    width: 30px;
+    height: 30px;
+    background-color: #ffffffff;
+    color: #7382f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.TablePageBtn:hover {
+    background-color: #e3e4ff;
+}
+
+.TablePageBtn.activ {
+    background-color: #7382f8;
+    color: #ffffff;
+}

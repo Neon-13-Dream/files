@@ -1,0 +1,344 @@
+.itemList {
+    width: 100%;
+    height: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 5px;
+}
+
+.sizeInput {
+    width: 50px;
+}
+.titleInput {
+    width: 100%;
+}
+
+.checkBox {
+    width: 20px;
+    height: 20px;
+    background: #00000088;
+    border: 1px solid #ffffff;
+    border-radius: 2px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkBox.checked::after {
+    display: block;
+    content: '';
+    width: 90%;
+    height: 90%;
+    background: #71ff7dff;
+    border-radius: 1px;
+}
+
+.settingsBtn {
+    width: 20px;
+    height: 20px;
+    background: #00000088;
+    border: 1px solid #ffffff;
+    cursor: pointer;
+}
+
+.modalArea {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #00000080;
+    
+    z-index: 9999;
+}
+
+.mainArea {
+    width: 510px;
+    height: 360px;
+    padding: 15px 25px;
+    background-color: #282828ff;
+    border-radius: 5px;
+    overflow: visible !important;
+}
+
+.mainAreaTitle {
+    width: 100%;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    color: #ffffff;
+    margin: 10px;
+    overflow: visible !important;
+}
+
+.infoBlock1 {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.infoBlock1-fieldname {
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.infoBlock1-widthSetting {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.infoBlock1-widthInput {
+    all: unset;
+    margin-left: 10px;
+    padding: 5px;
+    width: 40px;
+    height: 18px;
+    font-size: 14px;
+    border-bottom: 1px solid #ffffff;
+}
+
+.infoBlock1-widthInput[type=number] {
+    -moz-appearance: textfield;
+}
+
+.infoBlock1-widthInput[type=number]::-webkit-outer-spin-button,
+.infoBlock1-widthInput[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.infoBlock2 {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.infoBlock2-titleInput {
+    all: unset;
+    margin-left: 10px;
+    padding: 5px;
+    flex: 1;
+    height: 18px;
+    font-size: 14px;
+    border-bottom: 1px solid #ffffff;
+}
+
+.styleBlockArea {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.styleBlock {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: space-between;
+}
+
+.styleSetting1 {
+    width: 100%;
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    color: #ffffff;
+}
+
+.styleBlockTitle {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.styleBlockWrap {
+    display: flex;
+    align-items: start;
+    color: #ffffff;
+    font-size: 14px;
+    gap: 5px;
+}
+
+.styleSetting2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.styleSetting2>div {
+    flex: 1;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    text-align: center;
+    background-color: #00000000;
+    cursor: pointer;
+}
+
+.styleSetting2>div:first-child {
+    border-radius: 5px 0 0 5px;
+}
+
+.styleSetting2>div:last-child {
+    border-radius: 0 5px 5px 0;
+}
+
+.styleSetting2>div:hover {
+    background-color: #ffffff77;
+}
+
+.styleSetting2>div.activ {
+    background-color: #ffffff;
+    color: #282828ff;
+    font-weight: bold;
+}
+
+.styleSetting3 {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.colorList {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.colorList>div {
+    color: #ffffff;
+    margin-right: 10px;
+}
+
+.myColorPicker div {
+    display: none;
+}
+
+.myColorPicker {
+    width: 150px !important;
+    border-radius: 5px !important;
+    overflow: hidden;
+}
+
+/* Пример — изменить кнопку */
+.myColorPicker button {
+    border-radius: 8px !important;
+}
+
+/* Пример — изменить поле HEX */
+.myColorPicker input {
+    font-size: 18px !important;
+}
+
+.colorListItems {
+    width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.myColorPicker2 div {
+    display: none;
+}
+
+.myColorPicker2 {
+    width: 60px !important;
+    border-radius: 5px !important;
+    overflow: hidden;
+    position: relative;
+}
+
+/* .myColorPicker2:first-child:after {
+    content: "odd";
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--custim-color);
+}
+
+.myColorPicker2:last-child:after {
+    content: "even";
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--custim-color);
+} */
+
+.customCheckBox {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #ffffff;
+    border-radius: 2px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.customCheckBox > span {
+    width: 100%;
+    height: 100%;
+    background-color: #79e1f3;
+    border-radius: 2px;
+    
+    transform: scale(0);
+    transition: transform .15s ease-in-out;
+}
+.customCheckBox.checked > span {
+    transform: scale(1);
+}
+
+.buttons {
+    width: 100%;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 10px;
+}
+
+.buttonClose, .buttonSave {
+    width: 70px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+
+    cursor: pointer;
+}
