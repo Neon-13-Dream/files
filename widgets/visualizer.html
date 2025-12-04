@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UZCOSMOS | Space Land Monitoring</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin="" />
+
+    <!-- Leaflet JS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- html2canvas for PNG export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+
+      #map {
+        height: 100%;
+        width: 100%;
+        border-radius: 0.5rem;
+        z-index: 1;
+        border: 1px solid #334155;
+      }
+
+      .btn-active {
+        background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.5);
+      }
+      .btn-inactive {
+        background-color: #1e293b;
+        color: #94a3b8;
+        border: 1px solid #334155;
+      }
+      .btn-inactive:hover {
+        background-color: #334155;
+        color: white;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 3px;
+      }
+
+      .loader {
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        border-top: 3px solid #3b82f6;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .custom-label-icon {
+        background: rgba(15, 23, 42, 0.9);
+        color: #fff;
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 11px;
+        font-weight: bold;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        white-space: nowrap;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+      }
+      .marker-pin-up {
+        color: #3b82f6;
+        font-size: 24px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+      }
+      .marker-pin-down {
+        color: #ef4444;
+        font-size: 24px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+      }
+
+      /* Presidential styling */
+      .emblem-glow {
+        filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+      }
+      .risk-badge {
+        animation: pulse-risk 2s infinite;
+      }
+      @keyframes pulse-risk {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+      .export-btn:hover {
+        transform: scale(1.05);
+      }
+      .fullscreen-active .sidebar-hide {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body class="flex h-screen overflow-hidden">
+    <!-- SIDEBAR -->
+    <aside
+      class="w-80 bg-slate-900 border-r border-slate-800 flex flex-col z-20 shadow-2xl flex-shrink-0">
+      <!-- Header with UZCOSMOS Logo -->
+      <div class="p-4 border-b border-slate-800 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
+        <!-- Top row: Logo + Platform Name -->
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3">
+            <!-- UZCOSMOS Logo -->
+            <div class="w-28 emblem-glow">
+              <svg viewBox="0 0 930.18 535.22" class="w-full h-auto">
+                <defs><style>.st0{fill:#fff;}</style></defs>
+                <path class="st0" d="M105.22,273.65c0,5.61-1.48,10-4.45,13.16-2.97,3.1-6.96,4.65-11.99,4.65s-9.16-1.58-12.19-4.74c-3.03-3.16-4.55-7.52-4.55-13.07v-39.87h-12.96v39.87c0,5.94,1.19,11.07,3.58,15.39,2.39,4.26,5.8,7.55,10.25,9.87,4.45,2.32,9.74,3.48,15.86,3.48s11.28-1.16,15.67-3.48c4.45-2.32,7.83-5.61,10.15-9.87,2.39-4.32,3.58-9.45,3.58-15.39v-39.87h-12.96v39.87Z"/>
+                <polygon class="st0" points="221.65 242.39 221.65 233.77 165.46 233.77 165.46 244.61 204.15 244.61 164.3 292.9 164.3 301.52 222.14 301.52 222.14 290.68 181.81 290.68 221.65 242.39"/>
+                <path class="st0" d="M309.27,301.03c3.22-.97,6.29-2.32,9.19-4.07,2.97-1.74,5.58-3.77,7.83-6.1l-7.64-8.03c-2.52,2.52-5.38,4.52-8.61,6-3.22,1.42-6.48,2.13-9.77,2.13s-6.12-.61-8.9-1.84c-2.71-1.23-5.13-2.9-7.25-5.03-2.06-2.13-3.67-4.61-4.84-7.45-1.16-2.9-1.74-6-1.74-9.29s.58-6.35,1.74-9.19c1.16-2.84,2.77-5.32,4.84-7.45,2.13-2.19,4.55-3.87,7.25-5.03,2.77-1.23,5.74-1.84,8.9-1.84s6.58.81,9.86,2.42c3.29,1.55,6.12,3.68,8.51,6.39l7.54-8.9c-2.19-2.26-4.71-4.16-7.54-5.71-2.84-1.61-5.84-2.84-9-3.68-3.09-.9-6.29-1.35-9.57-1.35-5.09,0-9.8.87-14.12,2.61-4.26,1.74-8.03,4.19-11.32,7.35-3.29,3.16-5.84,6.84-7.64,11.03-1.8,4.13-2.71,8.65-2.71,13.55s.9,9.39,2.71,13.65,4.29,7.97,7.45,11.13c3.22,3.16,6.96,5.64,11.22,7.45,4.32,1.74,8.96,2.61,13.93,2.61,3.29,0,6.51-.45,9.67-1.36Z"/>
+                <path class="st0" d="M416.39,235.61c-4.38-1.74-9.12-2.61-14.22-2.61s-9.83.87-14.22,2.61c-4.32,1.74-8.12,4.19-11.41,7.35-3.29,3.1-5.87,6.74-7.74,10.94-1.81,4.19-2.71,8.74-2.71,13.65s.9,9.48,2.71,13.74c1.87,4.19,4.45,7.87,7.74,11.03,3.29,3.16,7.09,5.64,11.41,7.45,4.38,1.74,9.12,2.61,14.22,2.61s9.83-.87,14.22-2.61c4.38-1.81,8.19-4.29,11.41-7.45,3.29-3.16,5.83-6.87,7.64-11.13,1.87-4.26,2.8-8.81,2.8-13.65s-.94-9.42-2.8-13.55c-1.81-4.19-4.35-7.87-7.64-11.03-3.22-3.16-7.03-5.61-11.41-7.35ZM423.16,276.94c-1.16,2.84-2.77,5.35-4.84,7.55-2.06,2.19-4.48,3.9-7.25,5.13-2.71,1.23-5.61,1.84-8.7,1.84s-6.03-.61-8.8-1.84-5.22-2.94-7.35-5.13c-2.13-2.19-3.8-4.71-5.03-7.55-1.22-2.9-1.84-6.03-1.84-9.39s.58-6.45,1.74-9.29c1.23-2.84,2.9-5.32,5.03-7.45,2.13-2.19,4.58-3.87,7.35-5.03,2.77-1.23,5.74-1.84,8.9-1.84s6,.61,8.7,1.84c2.77,1.16,5.19,2.84,7.25,5.03,2.06,2.13,3.68,4.61,4.84,7.45,1.23,2.84,1.84,5.94,1.84,9.29s-.61,6.48-1.84,9.39Z"/>
+                <path class="st0" d="M516.64,288.94c-2,1.42-4.84,2.13-8.51,2.13-2.39,0-4.96-.39-7.74-1.16-2.71-.84-5.42-2-8.12-3.48-2.71-1.55-5.22-3.39-7.54-5.52l-5.42,10.55c2.45,2.13,5.19,4,8.22,5.61,3.09,1.61,6.35,2.9,9.77,3.87,3.48.9,7.03,1.36,10.64,1.36,4.96,0,9.38-.81,13.25-2.42,3.93-1.61,7.03-3.9,9.28-6.87,2.26-2.97,3.39-6.55,3.39-10.74,0-3.48-.65-6.39-1.93-8.71-1.29-2.32-3.03-4.23-5.22-5.71-2.13-1.48-4.48-2.68-7.06-3.58-2.58-.97-5.16-1.84-7.74-2.61-2.58-.78-4.96-1.58-7.16-2.42-2.13-.84-3.87-1.9-5.22-3.19-1.29-1.29-1.93-2.97-1.93-5.03,0-2.26.9-3.97,2.71-5.13,1.87-1.16,4.32-1.74,7.35-1.74,1.8,0,3.8.23,6,.68,2.19.39,4.51,1.06,6.96,2.03,2.52.97,4.96,2.19,7.35,3.68l5.22-10.65c-3.22-2.13-7-3.84-11.32-5.13-4.26-1.29-8.64-1.94-13.15-1.94-5.09,0-9.54.81-13.35,2.42-3.74,1.55-6.67,3.77-8.8,6.68-2.13,2.84-3.19,6.23-3.19,10.16,0,3.48.65,6.36,1.93,8.61,1.35,2.26,3.09,4.13,5.22,5.61,2.19,1.42,4.58,2.61,7.16,3.58,2.58.9,5.16,1.71,7.74,2.42,2.64.64,5.03,1.42,7.16,2.32,2.13.84,3.84,1.9,5.13,3.19,1.35,1.29,2.03,3,2.03,5.13,0,2.58-1.03,4.58-3.1,6Z"/>
+                <polygon class="st0" points="619.15 278.19 596.71 233.77 581.92 233.77 581.92 301.52 593.72 301.52 593.72 251.87 614.9 294.55 623.21 294.55 644.3 251.87 644.3 301.52 656.19 301.52 656.19 233.77 641.4 233.77 619.15 278.19"/>
+                <path class="st0" d="M765.04,242.97c-3.22-3.16-7.03-5.61-11.41-7.35-4.38-1.74-9.12-2.61-14.22-2.61s-9.83.87-14.22,2.61c-4.32,1.74-8.12,4.19-11.41,7.35-3.29,3.1-5.87,6.74-7.74,10.94-1.81,4.19-2.71,8.74-2.71,13.65s.9,9.48,2.71,13.74c1.87,4.19,4.45,7.87,7.74,11.03,3.29,3.16,7.09,5.64,11.41,7.45,4.38,1.74,9.12,2.61,14.22,2.61s9.83-.87,14.22-2.61c4.38-1.81,8.19-4.29,11.41-7.45,3.29-3.16,5.84-6.87,7.64-11.13,1.87-4.26,2.8-8.81,2.8-13.65s-.93-9.42-2.8-13.55c-1.81-4.19-4.35-7.87-7.64-11.03ZM760.39,276.94c-1.16,2.84-2.77,5.35-4.84,7.55-2.06,2.19-4.48,3.9-7.25,5.13-2.71,1.23-5.61,1.84-8.7,1.84s-6.03-.61-8.8-1.84c-2.77-1.23-5.22-2.94-7.35-5.13-2.13-2.19-3.8-4.71-5.03-7.55-1.23-2.9-1.84-6.03-1.84-9.39s.58-6.45,1.74-9.29c1.23-2.84,2.9-5.32,5.03-7.45,2.13-2.19,4.58-3.87,7.35-5.03,2.77-1.23,5.74-1.84,8.9-1.84s6,.61,8.7,1.84c2.77,1.16,5.19,2.84,7.25,5.03,2.06,2.13,3.68,4.61,4.84,7.45,1.23,2.84,1.84,5.94,1.84,9.29s-.61,6.48-1.84,9.39Z"/>
+                <path class="st0" d="M869.16,273.55c-1.29-2.32-3.03-4.23-5.22-5.71-2.13-1.48-4.48-2.68-7.06-3.58-2.58-.97-5.16-1.84-7.74-2.61-2.58-.78-4.96-1.58-7.16-2.42-2.13-.84-3.87-1.9-5.22-3.19-1.29-1.29-1.93-2.97-1.93-5.03,0-2.26.9-3.97,2.71-5.13,1.87-1.16,4.32-1.74,7.35-1.74,1.8,0,3.8.23,6,.68,2.19.39,4.51,1.06,6.96,2.03,2.52.97,4.97,2.19,7.35,3.68l5.22-10.65c-3.22-2.13-7-3.84-11.32-5.13-4.26-1.29-8.64-1.94-13.15-1.94-5.09,0-9.54.81-13.35,2.42-3.74,1.55-6.67,3.77-8.8,6.68-2.13,2.84-3.19,6.23-3.19,10.16,0,3.48.65,6.36,1.93,8.61,1.35,2.26,3.09,4.13,5.22,5.61,2.19,1.42,4.58,2.61,7.16,3.58,2.58.9,5.16,1.71,7.74,2.42,2.64.64,5.03,1.42,7.16,2.32,2.13.84,3.84,1.9,5.13,3.19,1.35,1.29,2.03,3,2.03,5.13,0,2.58-1.03,4.58-3.1,6-2,1.42-4.84,2.13-8.51,2.13-2.39,0-4.96-.39-7.74-1.16-2.71-.84-5.42-2-8.12-3.48-2.71-1.55-5.22-3.39-7.54-5.52l-5.42,10.55c2.45,2.13,5.19,4,8.22,5.61,3.09,1.61,6.35,2.9,9.77,3.87,3.48.9,7.03,1.36,10.64,1.36,4.97,0,9.38-.81,13.25-2.42,3.93-1.61,7.03-3.9,9.28-6.87,2.26-2.97,3.39-6.55,3.39-10.74,0-3.48-.65-6.39-1.93-8.71Z"/>
+                <path class="st0" d="M311.38,193.54c6.16-15.68,18.2-35.7,28.73-48.67,5.78-7.12,22.91-24.02,30.41-29.67,3.51-2.67,10.05-7.27,14.5-10.13,19.36-12.23,41.89-21.72,64.06-26.2,14.05-2.67,22.77-3.94,39.45-3.87,21.02,0,33.78,2,52.26,7,13.09,3.71,21.37,7.01,33.72,13.07,18.57,9.38,32.12,18.86,47.4,33.74,6.51,6.22,13.72,14.17,17.47,19.07.14.2.4.13.74-.13.27-.27-1.82-3.27-4.65-6.67-2.83-3.4-8.09-9.33-11.8-13.13-21.48-21.93-48.44-39.12-77.48-48.94-11.01-3.82-22.98-6.66-34.39-8.53-9.77-1.81-39.18-2.39-49.23-1.27-4.45.4-11.4,1.4-15.51,2.07-34.65,6.04-67.62,21.73-94.41,44.6-7.34,6.29-18.89,17.89-24.81,25.34-5.98,7.35-14.13,19.37-18.88,27.67-7.01,11.81-14.93,32.1-18.34,44.87l-.41,2.2,13.69-.4c1.99-6.82,4.79-15.39,7.49-22Z"/>
+                <path class="st0" d="M639.37,387.52c-3.75,4.9-10.95,12.85-17.47,19.07-15.28,14.88-28.83,24.35-47.4,33.74-12.34,6.06-20.62,9.36-33.72,13.07-18.48,5-31.24,7.01-52.26,7-16.68.08-25.39-1.2-39.45-3.87-22.17-4.48-44.71-13.97-64.06-26.2-4.45-2.87-10.99-7.47-14.5-10.13-7.5-5.65-24.63-22.55-30.41-29.67-10.52-12.97-22.57-32.99-28.73-48.67-2.7-6.61-5.5-15.18-7.49-22l-13.69-.4.41,2.2c3.41,12.77,11.33,33.06,18.34,44.87,4.75,8.3,12.9,20.32,18.88,27.67,5.93,7.44,17.48,19.05,24.81,25.34,26.79,22.87,59.76,38.57,94.41,44.6,4.11.67,11.06,1.67,15.51,2.07,10.05,1.13,39.46.54,49.23-1.27,11.41-1.87,23.39-4.72,34.39-8.53,29.04-9.82,56-27.01,77.48-48.94,3.71-3.8,8.97-9.73,11.8-13.13,2.83-3.4,4.92-6.4,4.65-6.67-.34-.27-.61-.33-.74-.13Z"/>
+              </svg>
+            </div>
+          </div>
+          <!-- Language Selector -->
+          <select id="lang-select" onchange="switchLanguage(this.value)" class="bg-slate-800 text-slate-300 text-xs px-2 py-1 rounded border border-slate-600 cursor-pointer">
+            <option value="ru">🇷🇺 RU</option>
+            <option value="uz">🇺🇿 UZ</option>
+            <option value="en">🇬🇧 EN</option>
+          </select>
+        </div>
+        <!-- Platform Name -->
+        <div class="text-center mb-3">
+          <h2 class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 tracking-wide">
+            Space Land Monitoring
+          </h2>
+          <p class="text-[10px] text-slate-500 uppercase tracking-widest" data-i18n="projectName">Oqrabot Region</p>
+        </div>
+        <!-- Observation Period -->
+        <div class="bg-slate-800/50 rounded px-3 py-1.5 flex items-center justify-between">
+          <span class="text-[10px] text-slate-400 uppercase tracking-wide" data-i18n="period">Период наблюдений</span>
+          <span class="text-[11px] text-white font-mono font-medium" id="obs-period">--</span>
+        </div>
+      </div>
+
+      <!-- Scrollable Content -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-8">
+        <!-- File Upload -->
+        <div>
+          <label
+            class="block w-full cursor-pointer bg-slate-800 hover:bg-slate-700 text-white py-3 px-4 rounded border border-slate-600 border-dashed transition-all text-center group">
+            <div class="flex flex-col items-center gap-2">
+              <i
+                class="fa-solid fa-cloud-arrow-up text-blue-500 text-xl group-hover:scale-110 transition-transform"></i>
+              <span class="text-sm font-medium" data-i18n="uploadFiles">Загрузить CSV файлы</span>
+            </div>
+            <input
+              type="file"
+              id="csv-input"
+              multiple
+              accept=".csv"
+              class="hidden"
+              onchange="handleFileUpload(this)" />
+          </label>
+          <div
+            id="file-status"
+            class="text-[10px] text-center mt-2 text-slate-500">
+            <span data-i18n="noFiles">Файлы не загружены</span>
+          </div>
+        </div>
+
+        <!-- Dataset Controls -->
+        <div>
+          <h3
+            class="text-slate-500 text-[10px] uppercase font-bold mb-3 tracking-widest">
+            <span data-i18n="selectDataset">Выбор данных</span>
+          </h3>
+          <div class="space-y-2">
+            <button
+              onclick="switchDataset('ascending')"
+              id="btn-asc"
+              class="w-full text-left p-3 rounded-lg transition-all btn-inactive flex justify-between items-center group">
+              <span class="text-sm font-medium"
+                ><i
+                  class="fa-solid fa-arrow-trend-up mr-2 text-slate-600 group-hover:text-blue-500"></i
+                 data-i18n="ascending">Восходящий</span
+              >
+              <span
+                class="text-xs bg-slate-950 px-2 py-0.5 rounded text-slate-500"
+                id="count-asc"
+                >0</span
+              >
+            </button>
+            <button
+              onclick="switchDataset('descending')"
+              id="btn-desc"
+              class="w-full text-left p-3 rounded-lg transition-all btn-inactive flex justify-between items-center group">
+              <span class="text-sm font-medium"
+                ><i
+                  class="fa-solid fa-arrow-trend-down mr-2 text-slate-600 group-hover:text-blue-500"></i
+                 data-i18n="descending">Нисходящий</span
+              >
+              <span
+                class="text-xs bg-slate-950 px-2 py-0.5 rounded text-slate-500"
+                id="count-desc"
+                >0</span
+              >
+            </button>
+            <button
+              onclick="switchDataset('vertical')"
+              id="btn-vert"
+              class="w-full text-left p-3 rounded-lg transition-all btn-inactive flex justify-between items-center group">
+              <span class="text-sm font-medium"
+                ><i
+                  class="fa-solid fa-arrows-up-down mr-2 text-slate-600 group-hover:text-purple-500"></i
+                 data-i18n="vertical">Вертикальный</span
+              >
+              <span
+                class="text-xs bg-slate-950 px-2 py-0.5 rounded text-slate-500"
+                id="count-vert"
+                >0</span
+              >
+            </button>
+            <button
+              onclick="switchDataset('eastwest')"
+              id="btn-ew"
+              class="w-full text-left p-3 rounded-lg transition-all btn-inactive flex justify-between items-center group">
+              <span class="text-sm font-medium"
+                ><i
+                  class="fa-solid fa-arrows-left-right mr-2 text-slate-600 group-hover:text-orange-500"></i
+                 data-i18n="eastwest">Горизонтальное</span
+              >
+              <span
+                class="text-xs bg-slate-950 px-2 py-0.5 rounded text-slate-500"
+                id="count-ew"
+                >0</span
+              >
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div>
+          <h3 class="text-slate-500 text-[10px] uppercase font-bold mb-3 tracking-widest">
+            <span data-i18n="keyStats">Ключевые показатели</span>
+          </h3>
+          <div class="space-y-3">
+            <!-- Max Up/Down (Total Displacement) -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-slate-800 p-3 rounded border border-slate-700">
+                <div class="text-[10px] text-slate-400 font-bold mb-1">
+                  <span data-i18n="maxUpward">МАКС. ПОДЪЁМ (мм)</span>
+                </div>
+                <div class="text-lg font-mono font-bold text-blue-400" id="stat-max-up">--</div>
+              </div>
+              <div class="bg-slate-800 p-3 rounded border border-slate-700">
+                <div class="text-[10px] text-slate-400 font-bold mb-1">
+                  <span data-i18n="maxDownward">МАКС. ОСЕДАНИЕ (мм)</span>
+                </div>
+                <div class="text-lg font-mono font-bold text-red-400" id="stat-max-down">--</div>
+              </div>
+            </div>
+
+            <!-- Average Rate -->
+            <div class="bg-slate-800 p-3 rounded border border-slate-700">
+              <div class="text-[10px] text-slate-400 font-bold mb-1">
+                <span data-i18n="avgRate">СРЕДНЯЯ СКОРОСТЬ (мм/год)</span>
+              </div>
+              <div class="text-lg font-mono font-bold text-white" id="stat-avg-rate">--</div>
+            </div>
+
+            <!-- Total Points -->
+            <div class="bg-slate-800 p-3 rounded border border-slate-700">
+              <div class="text-[10px] text-slate-400 font-bold mb-1">
+                <span data-i18n="totalPoints">ВСЕГО ТОЧЕК</span>
+              </div>
+              <div class="text-lg font-mono font-bold text-slate-300" id="stat-total-points">--</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Risk Zones (only for Vertical) -->
+        <div id="risk-section" class="hidden">
+          <h3 class="text-slate-500 text-[10px] uppercase font-bold mb-3 tracking-widest flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+            <span data-i18n="riskZones">Зоны риска</span>
+          </h3>
+          <div class="space-y-2">
+            <!-- Moderate Risk (>5mm) -->
+            <div class="bg-amber-900/30 p-3 rounded border border-amber-700/50 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                <span class="text-[11px] text-amber-200" data-i18n="riskModerate">Просадка > 5 мм</span>
+              </div>
+              <div class="text-right">
+                <span class="text-sm font-mono font-bold text-amber-400" id="risk-moderate-count">0</span>
+                <span class="text-[10px] text-amber-500 ml-1" id="risk-moderate-pct">(0%)</span>
+              </div>
+            </div>
+            <!-- Critical Risk (>10mm) -->
+            <div class="bg-red-900/30 p-3 rounded border border-red-700/50 flex items-center justify-between risk-badge">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                <span class="text-[11px] text-red-200" data-i18n="riskCritical">Просадка > 10 мм</span>
+              </div>
+              <div class="text-right">
+                <span class="text-sm font-mono font-bold text-red-400" id="risk-critical-count">0</span>
+                <span class="text-[10px] text-red-500 ml-1" id="risk-critical-pct">(0%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="mt-auto">
+          <div class="bg-slate-800 p-4 rounded border border-slate-700">
+            <div
+              class="flex justify-between text-[10px] text-slate-400 font-bold mb-2">
+              <span id="legend-min" data-i18n="subsidence">Оседание</span>
+              <span id="legend-mid" data-i18n="stable">Стабильно</span>
+              <span id="legend-max" data-i18n="uplift">Подъём</span>
+            </div>
+            <div
+              class="h-3 w-full rounded mb-2"
+              style="
+                background: linear-gradient(
+                  90deg,
+                  rgb(139, 0, 0) 0%,
+                  rgb(255, 100, 50) 15%,
+                  rgb(255, 180, 100) 30%,
+                  rgb(255, 255, 200) 45%,
+                  rgb(220, 255, 220) 55%,
+                  rgb(150, 230, 200) 65%,
+                  rgb(100, 200, 230) 78%,
+                  rgb(50, 120, 200) 90%,
+                  rgb(0, 50, 150) 100%
+                );
+              "></div>
+            <div
+              class="flex justify-between text-[9px] text-slate-500 font-mono">
+              <span id="legend-val-min">-15</span>
+              <span id="legend-val-mid">0</span>
+              <span id="legend-val-max">+15</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="p-3 border-t border-slate-800 bg-slate-900 space-y-2">
+        <!-- Export PNG -->
+        <button onclick="exportPNG()" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white py-2 px-4 rounded text-sm font-medium flex items-center justify-center gap-2 transition-all export-btn">
+          <i class="fa-solid fa-download"></i>
+          <span data-i18n="exportPNG">Скачать PNG</span>
+        </button>
+        <!-- Fullscreen -->
+        <button onclick="toggleFullscreen()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 px-4 rounded text-sm font-medium flex items-center justify-center gap-2 transition-all">
+          <i class="fa-solid fa-expand" id="fullscreen-icon"></i>
+          <span data-i18n="fullscreen">Полный экран</span>
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-3 border-t border-slate-800 bg-slate-950 text-center">
+        <div class="text-[10px] text-slate-600">
+          Developed by Javokhirbek Parpikhodjaev
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col h-full relative bg-slate-950">
+      <!-- MAP SECTION -->
+      <div class="flex-1 relative p-4 pb-0">
+        <div id="map" class="shadow-2xl bg-black"></div>
+        <div
+          id="main-loader"
+          class="hidden absolute inset-0 m-4 rounded bg-slate-900/80 z-[1000] flex flex-col items-center justify-center backdrop-blur-sm">
+          <div class="loader mb-4 border-t-blue-500 border-slate-700"></div>
+          <div class="text-sm font-medium text-slate-300 animate-pulse">
+            Processing Point Cloud...
+          </div>
+        </div>
+      </div>
+
+      <!-- CHART SECTION -->
+      <div class="h-72 p-4 flex-shrink-0 z-10">
+        <div
+          class="bg-slate-900 h-full rounded-lg border border-slate-800 shadow-xl flex flex-col overflow-hidden">
+          <div
+            class="px-4 py-2 border-b border-slate-800 bg-slate-800/50 flex justify-between items-center">
+            <h4
+              class="text-xs font-bold text-slate-300 flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-blue-500"></i>
+              <span data-i18n="chartTitle">Временной ряд смещений</span>
+            </h4>
+            <div class="flex gap-5 text-xs font-mono">
+              <span class="text-slate-500">ID: <span class="text-white" id="info-id">--</span></span>
+              <span class="text-slate-500"><span data-i18n="displRate">Скорость</span>: <span class="text-white font-bold" id="info-vel">--</span></span>
+              <span class="text-slate-500"><span data-i18n="totalDispl">Общее смещ.</span>: <span class="text-white font-bold" id="info-total">--</span></span>
+              <span class="text-slate-500">Loc: <span class="text-white" id="info-coords">--</span></span>
+            </div>
+          </div>
+          <div class="relative flex-1 w-full min-h-0 p-2">
+            <canvas id="tsChart"></canvas>
+            <div
+              id="chart-hint"
+              class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 bg-slate-900/40 backdrop-blur-[2px]">
+              <i
+                class="fa-solid fa-hand-pointer mb-3 text-3xl opacity-75 text-blue-400"></i>
+              <span
+                class="text-sm font-medium text-slate-300 tracking-wide drop-shadow-md"
+                 data-i18n="chartHint">Нажмите на точку на карте</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // --- CONFIGURATION ---
+      const mapConfig = {
+        center: [38.25, 66.82],
+        zoom: 13,
+        minZoom: 4,
+        maxZoom: 19,
+      };
+
+      // --- GLOBAL STATE ---
+      const datasets = {
+        ascending: [],
+        descending: [],
+        vertical: [],
+        eastwest: [],
+      };
+      const dates = {
+        ascending: [],
+        descending: [],
+        vertical: [],
+        eastwest: [],
+      };
+      let currentType = null;
+      let map, layerGroup, highlightLayer, chartInstance;
+      let colorRange = { min: -15, max: 15 }; // Dynamic color range
+      let currentLang = "ru";
+
+      // --- TRANSLATIONS ---
+      const translations = {
+        ru: {
+          subtitle: "Спутниковый мониторинг",
+          projectName: "Регион Окработ",
+          period: "Период наблюдений",
+          uploadFiles: "Загрузить CSV файлы",
+          noFiles: "Файлы не загружены",
+          filesLoaded: "Файлы загружены",
+          processing: "Обработка...",
+          selectDataset: "Выбор данных",
+          ascending: "Восходящий",
+          descending: "Нисходящий",
+          vertical: "Вертикальный",
+          eastwest: "Горизонтальное",
+          keyStats: "Ключевые показатели",
+          maxUpward: "МАКС. ПОДЪЁМ (мм)",
+          maxDownward: "МАКС. ОСЕДАНИЕ (мм)",
+          avgRate: "СРЕДНЯЯ СКОРОСТЬ (мм/год)",
+          totalPoints: "ВСЕГО ТОЧЕК",
+          riskZones: "Зоны риска",
+          riskModerate: "Просадка > 5 мм",
+          riskCritical: "Просадка > 10 мм",
+          subsidence: "Оседание",
+          stable: "Стабильно",
+          uplift: "Подъём",
+          westward: "На запад",
+          eastward: "На восток",
+          chartTitle: "Временной ряд смещений",
+          chartHint: "Нажмите на точку на карте",
+          displacement: "Смещение",
+          trend: "Тренд",
+          displRate: "Скорость",
+          totalDispl: "Общее смещ.",
+          exportPNG: "Скачать PNG",
+          fullscreen: "Полный экран",
+        },
+        uz: {
+          subtitle: "Sun'iy yo'ldosh monitoringi",
+          projectName: "Oqrabot Hududi",
+          period: "Kuzatuv davri",
+          uploadFiles: "CSV fayllarni yuklash",
+          noFiles: "Fayllar yuklanmagan",
+          filesLoaded: "Fayllar yuklandi",
+          processing: "Qayta ishlash...",
+          selectDataset: "Ma'lumotlarni tanlash",
+          ascending: "Ko'tariluvchi",
+          descending: "Tushuvchi",
+          vertical: "Vertikal",
+          eastwest: "Sharq-G'arb",
+          keyStats: "Asosiy ko'rsatkichlar",
+          maxUpward: "MAKS. KO'TARILISH (mm)",
+          maxDownward: "MAKS. CHO'KISH (mm)",
+          avgRate: "O'RTACHA TEZLIK (mm/yil)",
+          totalPoints: "JAMI NUQTALAR",
+          riskZones: "Xavfli zonalar",
+          riskModerate: "Cho'kish > 5 mm",
+          riskCritical: "Cho'kish > 10 mm",
+          subsidence: "Cho'kish",
+          stable: "Barqaror",
+          uplift: "Ko'tarilish",
+          westward: "G'arbga",
+          eastward: "Sharqqa",
+          chartTitle: "Siljishlar vaqt qatori",
+          chartHint: "Xaritadagi nuqtani bosing",
+          displacement: "Siljish",
+          trend: "Trend",
+          displRate: "Tezlik",
+          totalDispl: "Umumiy siljish",
+          exportPNG: "PNG yuklash",
+          fullscreen: "To'liq ekran",
+        },
+        en: {
+          subtitle: "Satellite Monitoring",
+          projectName: "Oqrabot Region",
+          period: "Observation Period",
+          uploadFiles: "Upload CSV Files",
+          noFiles: "No files loaded",
+          filesLoaded: "Files loaded",
+          processing: "Processing...",
+          selectDataset: "Select Dataset",
+          ascending: "Ascending",
+          descending: "Descending",
+          vertical: "Vertical",
+          eastwest: "East-West",
+          keyStats: "Key Statistics",
+          maxUpward: "MAX UPWARD (mm)",
+          maxDownward: "MAX DOWNWARD (mm)",
+          avgRate: "AVG. RATE (mm/year)",
+          totalPoints: "TOTAL POINTS",
+          riskZones: "Risk Zones",
+          riskModerate: "Subsidence > 5 mm",
+          riskCritical: "Subsidence > 10 mm",
+          subsidence: "Subsidence",
+          stable: "Stable",
+          uplift: "Uplift",
+          westward: "Westward",
+          eastward: "Eastward",
+          chartTitle: "Displacement Time-Series",
+          chartHint: "Click a point on the map",
+          displacement: "Displacement",
+          trend: "Trend",
+          displRate: "Displ. rate",
+          totalDispl: "Total displ.",
+          exportPNG: "Download PNG",
+          fullscreen: "Fullscreen",
+        },
+      };
+
+      function switchLanguage(lang) {
+        currentLang = lang;
+        const t = translations[lang];
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (t[key]) el.innerText = t[key];
+        });
+        // Update chart labels if chart exists
+        if (chartInstance && chartInstance.data.datasets.length > 0) {
+          chartInstance.data.datasets[0].label = t.displacement;
+          if (chartInstance.data.datasets[1]) chartInstance.data.datasets[1].label = t.trend;
+          chartInstance.update();
+        }
+      }
+
+      // --- INITIALIZATION ---
+      window.onload = function () {
+        initMap();
+        initChart();
+        switchLanguage("ru"); // Default language
+      };
+
+      // --- 1. MAP SETUP ---
+      function initMap() {
+        map = L.map("map", {
+          center: mapConfig.center,
+          zoom: mapConfig.zoom,
+          zoomControl: false,
+          attributionControl: false,
+          preferCanvas: true,
+        });
+
+        L.control.zoom({ position: "topright" }).addTo(map);
+
+        // Scale bar for presidential presentation
+        L.control.scale({
+          position: "bottomleft",
+          maxWidth: 150,
+          metric: true,
+          imperial: false,
+        }).addTo(map);
+
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          {
+            attribution: "Esri",
+            maxZoom: 19,
+          }
+        ).addTo(map);
+
+        L.tileLayer(
+          "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-hybrid/{z}/{x}/{y}{r}.png",
+          {
+            subdomains: "abcd",
+            maxZoom: 19,
+            opacity: 0.4,
+          }
+        ).addTo(map);
+
+        layerGroup = L.layerGroup().addTo(map);
+        highlightLayer = L.layerGroup().addTo(map);
+      }
+
+      // --- 2. CHART SETUP ---
+      function initChart() {
+        const ctx = document.getElementById("tsChart").getContext("2d");
+        Chart.defaults.color = "#94a3b8";
+        Chart.defaults.borderColor = "#334155";
+        Chart.defaults.font.family = '"Inter", sans-serif';
+
+        chartInstance = new Chart(ctx, {
+          type: "line",
+          data: { labels: [], datasets: [] },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            devicePixelRatio: window.devicePixelRatio || 2,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+              legend: {
+                display: true,
+                position: "top",
+                labels: { color: "#94a3b8", boxWidth: 12, padding: 10 },
+              },
+              tooltip: {
+                backgroundColor: "rgba(15, 23, 42, 0.95)",
+                titleColor: "#f8fafc",
+                bodyColor: "#e2e8f0",
+                borderColor: "#475569",
+                borderWidth: 1,
+                padding: 10,
+                displayColors: false,
+                titleFont: { size: 12, weight: "bold" },
+                bodyFont: { size: 12 },
+              },
+            },
+            scales: {
+              x: {
+                grid: { color: "rgba(51, 65, 85, 0.5)" },
+                ticks: {
+                  maxTicksLimit: 10,
+                  font: { size: 11, weight: 500 },
+                  color: "#94a3b8",
+                },
+              },
+              y: {
+                grid: { color: "rgba(51, 65, 85, 0.5)" },
+                title: {
+                  display: true,
+                  text: "Displacement (mm)",
+                  color: "#94a3b8",
+                  font: { size: 11, weight: 600 },
+                },
+                ticks: { font: { size: 11, weight: 500 }, color: "#94a3b8" },
+              },
+            },
+            elements: {
+              point: { radius: 0, hitRadius: 20, hoverRadius: 4 },
+              line: { borderWidth: 2 },
+            },
+          },
+        });
+      }
+
+      // --- 3. CSV PARSING ---
+      function handleFileUpload(input) {
+        const files = input.files;
+        if (!files.length) return;
+
+        document.getElementById("main-loader").classList.remove("hidden");
+        document.getElementById("file-status").innerText =
+          "Processing files...";
+        let processed = 0;
+
+        Array.from(files).forEach((file) => {
+          const lower = file.name.toLowerCase();
+          let type = null;
+
+          if (lower.includes("ascending")) type = "ascending";
+          else if (lower.includes("descending")) type = "descending";
+          else if (lower.includes("vertical")) type = "vertical";
+          else if (lower.includes("eastwest") || lower.includes("east_west"))
+            type = "eastwest";
+
+          if (!type) {
+            processed++;
+            checkDone(processed, files.length);
+            return;
+          }
+
+          Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            dynamicTyping: true,
+            complete: (results) => {
+              processData(type, results.data, results.meta.fields);
+              processed++;
+              checkDone(processed, files.length);
+            },
+            error: (err) => {
+              console.error("CSV Parse Error:", err);
+              processed++;
+              checkDone(processed, files.length);
+            },
+          });
+        });
+      }
+
+      function checkDone(current, total) {
+        if (current === total) {
+          document.getElementById("main-loader").classList.add("hidden");
+          document.getElementById("file-status").innerText = "All files loaded";
+          document
+            .getElementById("file-status")
+            .classList.add("text-green-500");
+
+          if (datasets.ascending.length) switchDataset("ascending");
+          else if (datasets.descending.length) switchDataset("descending");
+          else if (datasets.vertical.length) switchDataset("vertical");
+          else if (datasets.eastwest.length) switchDataset("eastwest");
+        }
+      }
+
+      function processData(type, data, fields) {
+        // Find required columns
+        let velKey =
+          fields.find((f) => f.trim() === "Velocity_mm_yr") ||
+          fields.find((f) => /velocity.*yr/i.test(f)) ||
+          fields.find((f) => /vel/i.test(f));
+        let latKey = fields.find((f) => /latitude|lat/i.test(f));
+        let lonKey = fields.find((f) => /longitude|lon/i.test(f));
+        let idKey = fields.find((f) => /^id$/i.test(f)) || "ID";
+        if (!idKey && fields[0]) idKey = fields[0];
+
+        // Find Total Displacement column (pre-calculated in CSV)
+        let totalDispKey =
+          fields.find((f) => f.trim() === "Total_Cumulative_Disp_mm") ||
+          fields.find((f) => /total.*disp/i.test(f));
+
+        if (!velKey || !latKey || !lonKey) {
+          console.warn(`Missing columns in ${type}. Fields found:`, fields);
+          return;
+        }
+
+        // Find date columns (YYYYMMDD format)
+        const dateKeys = fields
+          .filter(
+            (f) =>
+              /^\d{8}$/.test(f) && (f.startsWith("20") || f.startsWith("19"))
+          )
+          .sort();
+        dates[type] = dateKeys.map((d) => {
+          const s = String(d);
+          return `${s.substring(6, 8)}.${s.substring(4, 6)}.${s.substring(
+            0,
+            4
+          )}`;
+        });
+
+        datasets[type] = data
+          .map((row, idx) => {
+            const lat = parseFloat(row[latKey]);
+            const lon = parseFloat(row[lonKey]);
+            const vel = parseFloat(row[velKey]);
+            if (isNaN(lat) || isNaN(lon) || isNaN(vel)) return null;
+
+            // Time-series values (ALREADY zero-referenced in CSV - DO NOT re-zero!)
+            let ts = dateKeys.map((k) => parseFloat(row[k]) || 0);
+
+            // Use pre-calculated Total Displacement from CSV (preferred)
+            // Fallback to last time-series value if column missing
+            let totalDisp = totalDispKey ? parseFloat(row[totalDispKey]) : null;
+            if (totalDisp === null || isNaN(totalDisp)) {
+              totalDisp = ts.length > 0 ? ts[ts.length - 1] : 0;
+            }
+
+            return { id: row[idKey] || idx, lat, lon, vel, totalDisp, ts };
+          })
+          .filter((d) => d !== null);
+
+        const suffix =
+          { ascending: "asc", eastwest: "ew" }[type] || type.substring(0, 4);
+        const countEl = document.getElementById(`count-${suffix}`);
+        if (countEl) {
+          countEl.innerText = datasets[type].length.toLocaleString();
+          if (datasets[type].length > 0)
+            countEl.classList.replace("text-slate-500", "text-white");
+        }
+      }
+
+      // --- 4. VISUALIZATION LOGIC ---
+      function switchDataset(type) {
+        currentType = type;
+        const data = datasets[type];
+        if (!data || !data.length) return;
+
+        document.querySelectorAll('button[id^="btn-"]').forEach((btn) => {
+          btn.classList.remove("btn-active");
+          btn.classList.add("btn-inactive");
+        });
+        const suffix =
+          { ascending: "asc", eastwest: "ew" }[type] || type.substring(0, 4);
+        const activeBtn = document.getElementById(`btn-${suffix}`);
+        if (activeBtn) {
+          activeBtn.classList.remove("btn-inactive");
+          activeBtn.classList.add("btn-active");
+        }
+
+        // Update Legend with translations
+        const t = translations[currentLang];
+        const isEW = type === "eastwest";
+        document.getElementById("legend-min").innerText = isEW ? t.westward : t.subsidence;
+        document.getElementById("legend-max").innerText = isEW ? t.eastward : t.uplift;
+
+        chartInstance.data.datasets = [];
+        chartInstance.update();
+        document.getElementById("chart-hint").classList.remove("hidden");
+        document.getElementById("info-id").innerText = "--";
+        document.getElementById("info-vel").innerText = "--";
+        document.getElementById("info-total").innerText = "--";
+        document.getElementById("info-coords").innerText = "--";
+
+        // Update observation period
+        updateObservationPeriod(type);
+
+        // Update risk zones
+        updateRiskZones(data, type);
+
+        renderMap(data);
+      }
+
+      // --- DYNAMIC COLOR GRADIENT (Synspective-style exact) ---
+      function getColor(v) {
+        const min = colorRange.min;
+        const max = colorRange.max;
+
+        // Normalize value to -1 to +1 range
+        const range = Math.max(Math.abs(min), Math.abs(max));
+        const normalized = range > 0 ? v / range : 0;
+
+        // Synspective color palette (exact match)
+        // Negative (subsidence): Dark Red -> Red-Orange -> Orange -> Light Orange -> Pale Yellow
+        // Zero: Pale Yellow/Cream with slight green tint
+        // Positive (uplift): Light Green -> Cyan -> Light Blue -> Blue -> Dark Blue
+        const colors = [
+          { pos: -1.0, color: [139, 0, 0] }, // Dark Red
+          { pos: -0.7, color: [200, 50, 20] }, // Red
+          { pos: -0.45, color: [255, 100, 50] }, // Red-Orange
+          { pos: -0.25, color: [255, 180, 100] }, // Orange
+          { pos: -0.1, color: [255, 230, 160] }, // Light Orange/Peach
+          { pos: 0, color: [255, 255, 200] }, // Pale Yellow (stable)
+          { pos: 0.1, color: [220, 255, 220] }, // Very Light Green
+          { pos: 0.25, color: [150, 230, 200] }, // Light Mint/Green
+          { pos: 0.45, color: [100, 200, 230] }, // Light Cyan
+          { pos: 0.7, color: [50, 120, 200] }, // Blue
+          { pos: 1.0, color: [0, 50, 150] }, // Dark Blue
+        ];
+
+        // Clamp normalized value
+        const n = Math.max(-1, Math.min(1, normalized));
+
+        // Find color segment and interpolate
+        for (let i = 0; i < colors.length - 1; i++) {
+          const c1 = colors[i];
+          const c2 = colors[i + 1];
+          if (n >= c1.pos && n <= c2.pos) {
+            const t = (n - c1.pos) / (c2.pos - c1.pos);
+            const r = Math.round(c1.color[0] + t * (c2.color[0] - c1.color[0]));
+            const g = Math.round(c1.color[1] + t * (c2.color[1] - c1.color[1]));
+            const b = Math.round(c1.color[2] + t * (c2.color[2] - c1.color[2]));
+            return `rgb(${r},${g},${b})`;
+          }
+        }
+
+        // Edge cases
+        if (n <= -1) return `rgb(${colors[0].color.join(",")})`;
+        if (n >= 1) return `rgb(${colors[colors.length - 1].color.join(",")})`;
+        return "rgb(255,255,240)";
+      }
+
+      function updateLegendRange(min, max) {
+        const range = Math.max(Math.abs(min), Math.abs(max));
+        document.getElementById("legend-val-min").innerText = (-range).toFixed(
+          0
+        );
+        document.getElementById("legend-val-mid").innerText = "0";
+        document.getElementById("legend-val-max").innerText =
+          "+" + range.toFixed(0);
+      }
+
+      function renderMap(data) {
+        layerGroup.clearLayers();
+        highlightLayer.clearLayers();
+
+        // First pass: find min/max values
+        let maxVel = -Infinity;
+        let minVel = Infinity;
+        let maxTotalDispl = -Infinity;
+        let minTotalDispl = Infinity;
+        let sumVel = 0;
+
+        let pMaxTotal = null; // Point with max total displacement (highest positive)
+        let pMinTotal = null; // Point with min total displacement (lowest negative)
+
+        data.forEach((p) => {
+          // Velocity stats for color scale
+          if (p.vel > maxVel) maxVel = p.vel;
+          if (p.vel < minVel) minVel = p.vel;
+          sumVel += p.vel;
+
+          // Total displacement stats (use pre-calculated field)
+          if (p.totalDisp > maxTotalDispl) {
+            maxTotalDispl = p.totalDisp;
+            pMaxTotal = p;
+          }
+          if (p.totalDisp < minTotalDispl) {
+            minTotalDispl = p.totalDisp;
+            pMinTotal = p;
+          }
+        });
+
+        // Average Rate
+        const avgRate = data.length > 0 ? (sumVel / data.length) : 0;
+        const trendIcon = avgRate >= 0
+          ? '<i class="fa-solid fa-arrow-trend-up text-blue-400 ml-2"></i>'
+          : '<i class="fa-solid fa-arrow-trend-down text-red-400 ml-2"></i>';
+
+        // Update Stats UI
+        document.getElementById("stat-max-up").innerText = `+${maxTotalDispl.toFixed(2)}`;
+        document.getElementById("stat-max-down").innerText = `${minTotalDispl.toFixed(2)}`;
+        document.getElementById("stat-avg-rate").innerHTML = `${avgRate.toFixed(2)} ${trendIcon}`;
+        document.getElementById("stat-total-points").innerText = data.length.toLocaleString();
+
+        // Set dynamic color range based on VELOCITY
+        colorRange.min = minVel;
+        colorRange.max = maxVel;
+        updateLegendRange(minVel, maxVel);
+
+        const renderer = L.canvas({ padding: 0.5 });
+
+        // Second pass: render with dynamic colors
+        data.forEach((p) => {
+          const color = getColor(p.vel);
+
+          if (currentType === "eastwest") {
+            const rotation = p.vel >= 0 ? 0 : 180;
+            const arrowIcon = L.divIcon({
+              className: "bg-transparent",
+              html: `<i class="fa-solid fa-caret-right" style="font-size:14px;color:${color};transform:rotate(${rotation}deg);text-shadow:0 1px 2px rgba(0,0,0,0.3);display:block;"></i>`,
+              iconSize: [14, 14],
+              iconAnchor: [7, 7],
+            });
+            L.marker([p.lat, p.lon], { icon: arrowIcon, zIndexOffset: 100 })
+              .addTo(layerGroup)
+              .on("click", () => updateChart(p));
+          } else {
+            L.circleMarker([p.lat, p.lon], {
+              renderer: renderer,
+              radius: 4,
+              fillColor: color,
+              color: null,
+              weight: 0,
+              fillOpacity: 1.0,
+            })
+              .addTo(layerGroup)
+              .on("click", () => updateChart(p));
+          }
+        });
+
+        // Add highlight markers for MAX TOTAL DISPLACEMENT points
+        if (pMaxTotal) addHighlightMarker(pMaxTotal, "MAX UPLIFT", "up");
+        if (pMinTotal) addHighlightMarker(pMinTotal, "MAX SUBSIDE", "down");
+
+        const bounds = L.latLngBounds(data.map((d) => [d.lat, d.lon]));
+        map.fitBounds(bounds);
+      }
+
+      function addHighlightMarker(p, label, type) {
+        const iconHtml =
+          type === "up"
+            ? '<i class="fa-solid fa-location-pin marker-pin-up"></i>'
+            : '<i class="fa-solid fa-location-pin marker-pin-down"></i>';
+
+        // Use pre-calculated Total Displacement from CSV
+        const customIcon = L.divIcon({
+          className: "bg-transparent",
+          html: `<div class="flex flex-col items-center" style="transform: translate(-50%, -100%);">
+                   <div class="custom-label-icon mb-1">${label}<br>${p.totalDisp.toFixed(1)} mm</div>
+                   ${iconHtml}
+                 </div>`,
+        });
+
+        L.marker([p.lat, p.lon], { icon: customIcon, zIndexOffset: 1000 })
+          .addTo(highlightLayer)
+          .on("click", () => updateChart(p));
+      }
+
+      // Calculate linear regression for trend line
+      function linearRegression(data) {
+        const n = data.length;
+        if (n < 2) return { slope: 0, intercept: 0 };
+
+        let sumX = 0,
+          sumY = 0,
+          sumXY = 0,
+          sumX2 = 0;
+        for (let i = 0; i < n; i++) {
+          sumX += i;
+          sumY += data[i];
+          sumXY += i * data[i];
+          sumX2 += i * i;
+        }
+
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+
+        return { slope, intercept };
+      }
+
+      function updateChart(point) {
+        document.getElementById("chart-hint").classList.add("hidden");
+
+        document.getElementById("info-id").innerText = point.id;
+
+        // Displacement rate (velocity) - mm/year
+        const velEl = document.getElementById("info-vel");
+        velEl.innerText = `${point.vel.toFixed(2)} mm/yr`;
+        velEl.style.color = getColor(point.vel);
+
+        // Total displacement - use pre-calculated field from CSV
+        const totalEl = document.getElementById("info-total");
+        totalEl.innerText = `${point.totalDisp.toFixed(2)} mm`;
+        totalEl.style.color = getColor(point.vel);
+
+        document.getElementById("info-coords").innerText = `${point.lat.toFixed(4)}, ${point.lon.toFixed(4)}`;
+
+        const labelDates = dates[currentType];
+        const color = getColor(point.vel);
+        const bg = color.replace("rgb", "rgba").replace(")", ", 0.2)");
+
+        // Calculate trend line
+        const { slope, intercept } = linearRegression(point.ts);
+        const trendData = point.ts.map((_, i) => intercept + slope * i);
+
+        const t = translations[currentLang];
+        chartInstance.data.labels = labelDates;
+        chartInstance.data.datasets = [
+          {
+            label: t.displacement,
+            data: point.ts,
+            borderColor: color,
+            backgroundColor: bg,
+            borderWidth: 2,
+            pointRadius: 3,
+            fill: true,
+            tension: 0.3,
+          },
+          {
+            label: t.trend,
+            data: trendData,
+            borderColor: "#ef4444",
+            borderWidth: 2,
+            borderDash: [6, 4],
+            pointRadius: 0,
+            fill: false,
+            tension: 0,
+          },
+        ];
+        chartInstance.update();
+      }
+
+      // --- EXPORT PNG ---
+      async function exportPNG() {
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Экспорт...';
+        btn.disabled = true;
+
+        try {
+          // Capture the main content area
+          const mainEl = document.querySelector('main');
+          const canvas = await html2canvas(mainEl, {
+            scale: 2,
+            backgroundColor: '#0f172a',
+            logging: false,
+            useCORS: true,
+          });
+
+          // Create download link
+          const link = document.createElement('a');
+          const datasetName = currentType || 'insar';
+          const timestamp = new Date().toISOString().slice(0, 10);
+          link.download = `InSAR_Oqrabot_${datasetName}_${timestamp}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        } catch (err) {
+          console.error('Export failed:', err);
+          alert('Ошибка экспорта. Попробуйте еще раз.');
+        } finally {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      }
+
+      // --- FULLSCREEN MODE ---
+      function toggleFullscreen() {
+        const icon = document.getElementById('fullscreen-icon');
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen();
+          icon.classList.remove('fa-expand');
+          icon.classList.add('fa-compress');
+        } else {
+          document.exitFullscreen();
+          icon.classList.remove('fa-compress');
+          icon.classList.add('fa-expand');
+        }
+      }
+
+      // Listen for fullscreen change
+      document.addEventListener('fullscreenchange', () => {
+        const icon = document.getElementById('fullscreen-icon');
+        if (document.fullscreenElement) {
+          icon.classList.remove('fa-expand');
+          icon.classList.add('fa-compress');
+        } else {
+          icon.classList.remove('fa-compress');
+          icon.classList.add('fa-expand');
+        }
+      });
+
+      // --- UPDATE OBSERVATION PERIOD ---
+      function updateObservationPeriod(type) {
+        const dateCols = dates[type];
+        if (!dateCols || dateCols.length < 2) {
+          document.getElementById('obs-period').innerText = '--';
+          return;
+        }
+        const first = dateCols[0];
+        const last = dateCols[dateCols.length - 1];
+        document.getElementById('obs-period').innerText = `${first} → ${last}`;
+      }
+
+      // --- UPDATE RISK ZONES ---
+      function updateRiskZones(data, type) {
+        const riskSection = document.getElementById('risk-section');
+
+        // Only show for vertical dataset
+        if (type !== 'vertical') {
+          riskSection.classList.add('hidden');
+          return;
+        }
+
+        riskSection.classList.remove('hidden');
+
+        // Count risk zones (negative total displacement = subsidence)
+        let moderate = 0; // > 5mm subsidence
+        let critical = 0; // > 10mm subsidence
+
+        data.forEach(p => {
+          if (p.totalDisp < -5) moderate++;
+          if (p.totalDisp < -10) critical++;
+        });
+
+        const total = data.length;
+        const moderatePct = total > 0 ? ((moderate / total) * 100).toFixed(1) : 0;
+        const criticalPct = total > 0 ? ((critical / total) * 100).toFixed(1) : 0;
+
+        document.getElementById('risk-moderate-count').innerText = moderate.toLocaleString();
+        document.getElementById('risk-moderate-pct').innerText = `(${moderatePct}%)`;
+        document.getElementById('risk-critical-count').innerText = critical.toLocaleString();
+        document.getElementById('risk-critical-pct').innerText = `(${criticalPct}%)`;
+      }
+    </script>
+  </body>
+</html>
