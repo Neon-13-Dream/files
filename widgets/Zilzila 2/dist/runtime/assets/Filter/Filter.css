@@ -1,0 +1,120 @@
+.filtersArea {
+	position: absolute;
+	
+	top: 10px;
+	left: 50%;
+	
+	width: 650px;
+	height: 490px;
+
+	background-color: var(--main_bgc);
+	border: 1px solid var(--background-color);
+	border-radius: 5px;
+	/* overflow: hidden; */
+
+	transform: translateX( -50% );
+	z-index: 1000;
+}
+
+.filterTitle {
+	position: relative;
+	height: 40px;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	background-color: var(--background-color);
+	color: var(--main_bgc);
+	font-weight: bold;
+
+	font-size: 20px;
+	user-select: none;
+}
+
+.filterName {
+	width: 100%;
+	padding-left: 50px;
+	padding-top: 10px;
+	padding-bottom: 5px;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.filterArea {
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+}
+
+.inputStyle {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+}
+
+.filterInput {
+	width: 220px;
+	height: 35px;
+
+	padding: 5px 10px;
+	font-size: 14px;
+	margin-right: 10px;
+
+	border: 1px solid var(--background-color);
+	border-radius: 5px;
+
+	background-color: var(--main_bgc);
+	color: var(--background-color);
+
+	outline: none;
+	transition: border-color 0.2s;
+}
+
+
+.bigInput {
+    width: 590px;
+    height: 40px;
+    font-size: 14px;
+    padding-left: 10px;
+	margin-left: 23px;
+}
+
+.filterBtns {
+	position: absolute;
+	right: 0;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+
+	margin-right: 10px;
+}
+
+.btnStyle {
+	width: 25px;
+	height: 25px;
+
+	padding: 5px;
+	border-radius: 5px;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	background-color: var(--main_bgc);
+	border-color: 1px solid var(--background-color);
+	opacity: 0.5;
+	cursor: pointer;
+}
+.btnStyle:hover {
+	opacity: 0.8;
+}
+
+
+.imgStyle {
+	width: 100%;
+	height: 100%;
+}
