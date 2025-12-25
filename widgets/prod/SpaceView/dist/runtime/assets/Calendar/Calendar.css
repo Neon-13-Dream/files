@@ -1,0 +1,225 @@
+/* =================== CSS-переменные =================== */
+:root {
+	--calendar-width: 300px;
+	--calendar-height: 360px;
+
+	--main-bgc: rgba(var(--main-bacground-color-rgb), 1);
+	--accent-color: #3b82f6;
+	--accent-color-dark: #1d4ed8;
+	--text-color: rgba(var(--main-second-color-rgb), 1);
+	--text-disabled: rgba(var(--main-second-color-rgb), 0.514);
+	--border-color: #516282;
+	--border-radius: 10px; /* теперь одинаковое скругление для всех элементов */
+	--transition-speed: 0.2s;
+}
+
+/* ------------------- Общий контейнер ------------------- */
+.calendarInputArea {
+	position: relative;
+    width: 100%;
+    height: 100%;
+	display: inline-block;
+}
+
+.calendarInput {
+	width: 100%;
+	height: 35px;
+	padding: 5px 10px;
+	font-size: 14px;
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius);
+	background-color: var(--main-bgc);
+	color: var(--text-color);
+	outline: none;
+	transition: border-color var(--transition-speed);
+}
+
+.calendarInput:focus {
+	border-color: var(--accent-color);
+}
+
+/* ------------------- Всплывающий календарь ------------------- */
+.calendarPopup {
+	display: none;
+	position: absolute;
+	top: calc(100% + 5px);
+	left: 50%;
+	width: var(--calendar-width);
+	height: var(--calendar-height);
+	padding: 5px;
+	border-radius: var(--border-radius);
+	border: 1px solid var(--border-color);
+	background-color: var(--main-bgc);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+	z-index: 300;
+	opacity: 0;
+	transform: translate(-50%, 5px);
+	transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+	flex-direction: column;
+	align-items: center;
+}
+
+.calendarPopup.open {
+	display: flex;
+	opacity: 1;
+	transform: translate(-50%, 10px);
+}
+
+/* ------------------- Верхние кнопки ------------------- */
+.calendarBtns {
+	width: Calc(100% - 10px);
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 5px;
+	gap: 5px;
+}
+
+.calendarBtn,
+.calendarInfo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius);
+	cursor: pointer;
+	user-select: none;
+    color: var(--text-color);
+	transition: background-color var(--transition-speed);
+}
+
+.calendarBtn:hover,
+.calendarInfo:hover {
+	background-color: rgba(59, 130, 246, 0.15);
+}
+
+.calendarBtn {
+	width: 45px;
+	height: 35px;
+}
+
+.calendarInfo {
+	width: 100%;
+	height: 35px;
+}
+
+/* ------------------- Линия ------------------- */
+.line {
+	display: block;
+	width: calc(100% - 10px);
+	height: 1px;
+	background-color: rgba(0, 0, 0, 0.1);
+	margin: 5px auto;
+}
+
+/* ------------------- Сетка ------------------- */
+.weeksArea {
+	width: 100%;
+	height: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+}
+
+.weeks {
+	font-weight: bold;
+	color: var(--text-color);
+}
+
+/* Сетки дней, месяцев, годов */
+.daysArea,
+.monthArea,
+.yearArea {
+	width: 100%;
+	gap: 2px;
+	background-color: var(--main-bgc);
+	border-radius: var(--border-radius);
+	/* border: 1px solid var(--border-color); */
+	display: grid;
+}
+
+.daysArea {
+	height: 260px;
+	grid-template-columns: repeat(7, 1fr);
+	grid-template-rows: repeat(6, 1fr);
+}
+
+.monthArea {
+	height: 290px;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(4, 1fr);
+}
+
+.yearArea {
+	height: 290px;
+	grid-template-columns: repeat(4, 1fr);
+	grid-auto-rows: 45px;
+	gap: 2px;
+	overflow-y: auto;
+}
+
+/* ------------------- Элементы календаря ------------------- */
+.days,
+.month,
+.year {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: var(--main-bgc);
+	color: var(--text-color);
+	border-radius: var(--border-radius);
+	user-select: none;
+	transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.month,
+.year {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+/* ------------------- Состояния ------------------- */
+/* Недоступные */
+.days.disabled,
+.month.disabled,
+.year.disabled {
+	color: var(--text-disabled);
+	cursor: default;
+}
+
+/* Соседние месяцы */
+.days.other-month {
+	color: var(--text-disabled);
+}
+
+/* Выбранные элементы: дни, месяцы, года */
+.days.selected-day,
+.month.selected-month,
+.year.activ {
+	background-color: var(--accent-color);
+	color: rgba(var(--main-second-color-rgb), 1);
+	font-weight: 600;
+	border-radius: 5px; /* единое скругление */
+}
+
+/* Сегодня (только для дня) */
+.days.today-day {
+	border: 1px solid var(--accent-color);
+	color: var(--accent-color);
+	font-weight: 600;
+}
+
+/* Сегодня + выбранный день */
+.days.selected-day.today-day {
+	background-color: var(--accent-color-dark);
+	color: #fff;
+}
+
+/* Hover */
+.days:not(.disabled):hover,
+.month:not(.disabled):hover,
+.year:not(.disabled):hover {
+	cursor: pointer;
+	background-color: rgba(59, 130, 246, 0.15);
+}
