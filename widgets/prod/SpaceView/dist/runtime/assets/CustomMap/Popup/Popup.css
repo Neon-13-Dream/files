@@ -1,0 +1,161 @@
+.PopupArea {
+    display: none;
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 400px;
+
+    flex-direction: column;
+    align-items: start;
+
+    border-radius: var(--main-border-radius);
+    background-color: rgba(var(--main-bacground-color-rgb), 1);
+}
+
+.PopupArea.activ {
+    display: flex;
+    left: Calc(100% + var(--main-padding));
+}
+
+.PopupInfoArea {
+    width: 100%;
+    padding: var(--main-border-radius);
+}
+
+.PopupTitle {
+    width: 100%;
+    text-align: left;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 26px;
+    letter-spacing: 2%;
+    vertical-align: bottom;
+    color: rgba(var(--main-second-color-rgb), 1);
+    margin-bottom: 20px;
+}
+
+.PopupInfoBlock {
+    width: 100%;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    position: relative;
+
+    margin-bottom: 10px;
+}
+
+.PopupInfoBlock:last-child {
+    margin-bottom: 0;
+}
+
+.PopupInfoBlock:last-child::after {
+    display: none;
+}
+
+.PopupInfoBlock::after {
+    display: block;
+    content: "";
+
+    position: absolute;
+    width: calc(100% - 10px);
+    height: 1px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background-color: rgba(var(--main-second-color-rgb), 0.1);
+}
+
+.PopupInfoTitle,
+.PopupInfoValue {
+    flex: 1;
+    height: 100%;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 2%;
+    vertical-align: bottom;
+    color: rgba(var(--main-second-color-rgb), 1);
+    opacity: 0.6;
+}
+
+.PopupInfoValue {
+    opacity: 1;
+}
+
+.FilterArea {
+    width: 100%;
+}
+
+.FilterBlock {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 15px;
+    border-bottom: 1px solid rgba(var(--main-second-color-rgb), 0.322);
+    border-radius: var(--main-border-radius);
+}
+
+.FilterTitle {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: 0%;
+    color: rgba(var(--main-second-color-rgb), 1);
+    margin-bottom: 5px;
+}
+
+.FilterInputBlock {
+    width: 100%;
+    height: 45px;
+    padding: 10px;
+    border-radius: 15px;
+    border: 1px solid #516282;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.FilterInputImg {
+    width: 25px;
+    height: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.FilterInputImg>img {
+    width: 100%;
+    height: 100%;
+}
+
+.FilterDate {
+    width: 100%;
+    height: 100%;
+    color: rgba(var(--main-second-color-rgb), 1);
+    background-color: rgba(var(--main-second-color-rgb), 0);
+}
+
+.itemRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.FilterText {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 20px;
+    letter-spacing: 0%;
+    color: rgba(var(--main-second-color-rgb), 1);
+}
