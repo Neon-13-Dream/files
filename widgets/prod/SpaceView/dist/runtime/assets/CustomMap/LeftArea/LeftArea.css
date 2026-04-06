@@ -1,0 +1,488 @@
+.LeftArea {
+    position: absolute;
+    top: var(--main-padding);
+    left: var(--main-padding);
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    width: 380px;
+    height: Calc(100% - 2 * var(--main-padding));
+
+    /* padding: var(--main-padding); */
+    padding: Calc(2*var(--main-padding));
+
+    background-color: rgba(var(--main-bacground-color-rgb), 1);
+    border-radius: var(--main-border-radius);
+    z-index: 2;
+}
+
+.LeftAreaHeader {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.LeaftAreaTypes {
+    width: Calc(100% - 5px - 30px);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.LeaftAreaType {
+    height: 35px;
+    padding: 5px 20px;
+    border-radius: var(--main-border-radius);
+    background-color: rgba(var(--main-second-color-rgb), 0);
+
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 2%;
+    vertical-align: bottom;
+    color: rgba(var(--main-second-color-rgb), 1);
+    opacity: 0.6;
+
+    cursor: pointer;
+    user-select: none;
+}
+
+.LeaftAreaType.activ {
+    opacity: 1;
+    background-color: rgba(var(--main-second-color-rgb), 0.1);
+}
+
+.LeftArea {
+    position: absolute;
+    top: var(--main-padding);
+    left: var(--main-padding);
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    width: 380px;
+    height: calc(100% - 2 * var(--main-padding));
+    padding: calc(2 * var(--main-padding));
+
+    background-color: rgba(var(--main-bacground-color-rgb), 1);
+    border-radius: var(--main-border-radius);
+}
+
+.LeftAreaList {
+    width: 100%;
+    flex: 1 1 auto;
+    /* растягиваем на оставшееся место */
+    min-height: 0;
+    /* позволяет scroll работать внутри flex */
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Стилизация полосы прокрутки для современных браузеров */
+.LeftAreaList::-webkit-scrollbar {
+    width: 10px;
+}
+
+.LeftAreaList::-webkit-scrollbar-track {
+    background: rgba(var(--main-second-color-rgb), 0);
+    /* фон дорожки скролла */
+    border-radius: 8px;
+}
+
+.LeftAreaList::-webkit-scrollbar-thumb {
+    background-color: #162131;
+    /* цвет ползунка */
+    border-radius: 8px;
+    border: 2px solid #2c2c2c;
+    /* отступы внутри дорожки */
+}
+
+/* Для Firefox */
+.LeftAreaList {
+    scrollbar-width: thin;
+    /* тонкий скролл */
+    scrollbar-color: #162131 rgba(var(--main-second-color-rgb), 0);
+    /* thumb track */
+}
+
+.LeftAreaListInfo {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 10px;
+}
+
+.ListAreaTitle {
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 26px;
+    letter-spacing: 2%;
+    vertical-align: bottom;
+    color: rgba(var(--main-second-color-rgb), 1);
+}
+
+.ListAreaContent {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+.ContentSelected {
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 14px;
+    letter-spacing: 2%;
+    vertical-align: bottom;
+    color: rgba(var(--main-second-color-rgb), 1);
+}
+
+.ContentBtns {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.ContentBtn {
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 14px;
+    letter-spacing: 2%;
+    vertical-align: bottom;
+    color: rgba(var(--main-second-color-rgb), 1);
+    opacity: 0.3;
+    user-select: none;
+    cursor: pointer;
+}
+
+.ContentBtn:hover {
+    opacity: 0.5;
+}
+
+.ContentBtn.activ {
+    opacity: 1;
+}
+
+.LeftAreaList {
+    width: 100%;
+    height: 100%;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.LeftAreaListItem {
+    width: 100%;
+    height: 100px;
+    /* <-- фиксированная высота */
+    border-radius: var(--main-border-radius);
+    border: 1px rgba(var(--main-second-color-rgb), 0.102) solid;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.LeftAreaListItem.Hududlar {
+    flex-direction: column;
+    /* из-за этого элементы внутри сжимаются */
+}
+
+
+.LeftAreaListItem.Tasvirlar {
+    cursor: pointer;
+    background-color: rgba(var(--main-second-color-rgb), 0.1);
+    gap: 10px;
+}
+
+.LeftAreaListItem.Tasvirlar:hover {
+    border: 1px solid #3773D555;
+    background-color: #3773D544;
+}
+
+.LeftAreaListItem.Tasvirlar.activ {
+    border: 1px solid #3773D5CC;
+    background-color: #3773D599;
+}
+
+.ItemTopContent {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ItemCheckBox {
+    width: 20px;
+    height: 20px;
+
+    border-radius: 5px;
+    border: 1px solid rgba(var(--main-second-color-rgb), 0.2);
+    background-color: rgba(var(--main-second-color-rgb), 0.133);
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 5;
+}
+
+.ItemCheckBox:hover {
+    border: 1px solid #3773D555;
+    background-color: #3773D544;
+}
+
+.ItemCheckBox.activ {
+    border: 1px solid #3773D5CC;
+    background-color: #3773D599;
+}
+
+.ItemCheckBox>img {
+    width: 80%;
+    height: 80%;
+}
+
+.ItemName {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 14px;
+    letter-spacing: 2%;
+    vertical-align: bottom;
+    color: rgba(var(--main-second-color-rgb), 1);
+}
+
+.ItemBottomContent {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ItemInfo,
+.ItemRightInfo {
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 18px;
+    letter-spacing: 2%;
+    vertical-align: bottom;
+    color: rgba(var(--main-second-color-rgb), 1);
+}
+
+.ItemBtns {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ItemBtn {
+    width: 25px;
+    height: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    cursor: pointer;
+}
+
+.ItemBtn:hover {
+    border-radius: 5px;
+    border: 1px solid rgba(var(--main-second-color-rgb), 0.2);
+    background-color: rgba(var(--main-second-color-rgb), 0.1);
+}
+
+.ItemBtn>img {
+    width: 80%;
+    height: 80%;
+}
+
+.ItemIcon {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: end;
+    justify-content: start;
+    padding: 5px;
+}
+
+.ItemIcon>img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.ItemRightContent {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: space-between;
+}
+
+.ItemRightInfo {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.InfoArea {
+    display: flex;
+    align-items: center;
+
+    background-color: rgba(var(--main-second-color-rgb), 0.1);
+    border-radius: 5px;
+    padding: 3px 5px;
+
+    width: 70px;
+    gap: 5px;
+}
+
+.InfoArea>img {
+    width: 15px;
+    height: 15px;
+}
+
+.EmptyArea {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.EmptyIcon {
+    width: 70px;
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.EmptyIcon>img {
+    width: 100%;
+    height: 100%;
+}
+
+.EmptyDesc {
+    margin-top: 10px;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 24px;
+    letter-spacing: 2%;
+    text-align: center;
+    vertical-align: bottom;
+    color: rgba(var(--main-second-color-rgb), 1);
+}
+
+
+
+
+
+
+
+
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.loader {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+/* Центральный неподвижный элемент */
+.center-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    z-index: 10;
+}
+
+.center-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(var(--main-bacground-color-rgb));
+    border-radius: 50%;
+    /* Замени на своё изображение: */
+    /* background-image: url('/path/to/center-image.png'); */
+    /* background-size: cover; */
+    /* background-position: center; */
+}
+
+/* Орбита и вращающийся элемент */
+.orbit {
+    width: 100%;
+    height: 100%;
+    border: 2px dashed rgb(var(--main-second-color-rgb));
+    /* Опционально: пунктирная орбита */
+    border-radius: 50%;
+    animation: rotate 2s linear infinite;
+    position: relative;
+}
+
+.orbit-item {
+    position: absolute;
+    top: -20px;
+    /* Позиционируем сверху орбиты */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+}
+
+.orbit-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(var(--main-bacground-color-rgb));
+    border-radius: 50%;
+    /* Замени на своё изображение: */
+    /* background-image: url('/path/to/orbit-image.png'); */
+    /* background-size: cover; */
+    /* background-position: center; */
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Плейсхолдеры для демонстрации (можно удалить) */
+.placeholder {
+    background-color: rgb(var(--main-bacground-color-rgb));
+    border: 3px solid rgb(var(--main-second-color-rgb));
+}
