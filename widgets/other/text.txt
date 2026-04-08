@@ -1,1 +1,43 @@
 Остальные неважные файлы
+
+ SELECT row_number() OVER (ORDER BY c.id)::integer AS objectid,
+    c.id AS source_id,
+    c.oid,
+    c.mgrs,
+    c.detected_date,
+    c.latitude,
+    c.longitude,
+    c.area_m2,
+    c.area_ha,
+    r.code AS region,
+    d.code AS district,
+    COALESCE(m.code, c.mahalla_id::text::character varying) AS mahalla,
+        CASE c.status
+            WHEN 'in_review'::text THEN 0
+            WHEN 'confirmed'::text THEN 2
+            WHEN 'rejected'::text THEN 3
+            ELSE NULL::integer
+        END AS status,
+    i.tree_type,
+    i.stump_found,
+    i.tree_count,
+    i.comment,
+    c.marked_photo,
+    c.before,
+    c.after,
+    c.created_at,
+    c.updated_at,
+    c.geom
+   FROM admin_panel_potentialdeforestationcase c
+     JOIN admin_panel_region r ON c.region_id = r.id
+     JOIN admin_panel_district d ON c.district_id = d.id
+     LEFT JOIN admin_panel_mahalla m ON m.code::text = c.mahalla_id::text
+     LEFT JOIN LATERAL ( SELECT di.tree_type,
+            di.stump_found,
+            di.tree_count,
+            di.comment
+           FROM admin_panel_deforestationinspection di
+          WHERE di.case_id = c.id
+          ORDER BY di.updated_at DESC, di.id DESC
+         LIMIT 1) i ON true
+  WHERE c.geom IS NOT NULL;
